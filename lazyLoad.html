@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>demo lazyload</title>
+  <script src="jquery.min.js"></script>
+  <style type="text/css">
+    * {
+      padding: 0;
+      margin: 0;
+      text-decoration: none;
+      list-style: none;
+    }
+    .layout {
+      margin: 0 auto;
+      width: 1000px;
+    }
+    .lazyload img {
+      width: 450px;
+      height: 600px;
+    }
+    .img-ct {
+      margin-left: -50px;
+      overflow: auto;
+    }
+    .item {
+      float: left;
+      margin-left: 50px;
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+<div class="lazyload">
+  <div class="layout">
+    <ul class="img-ct">
+      <li class="item">
+        <a href="javascript:void(0)"><img data-img="images/shu.jpg"></a>
+      </li>
+      <li class="item">
+        <a href="javascript:void(0)"><img data-img="images/shu.jpg"></a>
+      </li>
+      <li class="item">
+        <a href="javascript:void(0)"><img data-img="images/shu.jpg"></a>
+      </li>
+      <li class="item">
+        <a href="javascript:void(0)"><img data-img="images/shu.jpg"></a>
+      </li>
+      <li class="item">
+        <a href="javascript:void(0)"><img data-img="images/shu.jpg"></a>
+      </li>
+      <li class="item">
+        <a href="javascript:void(0)"><img data-img="images/shu.jpg"></a>
+      </li>
+      <li class="item">
+        <a href="javascript:void(0)"><img data-img="images/shu.jpg"></a>
+      </li>
+      <li class="item">
+        <a href="javascript:void(0)"><img data-img="images/shu.jpg"></a>
+      </li>
+      <li class="item">
+        <a href="javascript:void(0)"><img data-img="images/shu.jpg"></a>
+      </li>
+      <li class="item">
+        <a href="javascript:void(0)"><img data-img="images/shu.jpg"></a>
+      </li>
+      <li class="item">
+        <a href="javascript:void(0)"><img data-img="images/shu.jpg"></a>
+      </li>
+      <li class="item">
+        <a href="javascript:void(0)"><img data-img="images/shu.jpg"></a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  // 在Web应用程序中，系统的瓶颈常在于系统的响应速度。如果系统响应速度过慢，用户就会出现埋怨情绪，系统的价值也因此会大打折扣。因此，提高系统响应速度，是非常重要的。
+  // Web应用程序做的最多就是和后台数据库交互，而查询数据库是种非常耗时的过程。当数据库里记录过多时，查询优化更显得尤为重要。为了解决这种问题，有人提出了缓存的概念。缓存就是将用户频繁使用的数据放在内存中以便快速访问。在用户执行一次查询操作后，查询的记录会放在缓存中。当用户再次查询时，系统会首先从缓存中读取，如果缓存中没有，再查询数据库。缓存技术在一定程度上提升了系统性能，但是当数据量过大时，缓存就不太合适了。因为内存容量有限，把过多的数据放在内存中，会影响电脑性能。而另一种技术，懒加载可以解决这种问题。
+
+  // 原理:将img标签中的src属性删除或不设置,将其真正的图片地址存储在img标签的自定义属性中(比如data-src).
+  // 当js监听到该图片元素进入可视窗口时，即将自定义属性中的地址存储到src属性中，达到懒加载的效果。
+  // 这样做能防止页面一次性向服务器响应大量请求导致服务器响应慢，页面卡顿或崩溃等问题。
+
+  var lazyLoad = (function(){
+    var timer;
+    //图片出现可视区后延迟0.2秒加载
+    function init(){
+      $(window).on("scroll", function(){
+        if (timer) {
+          clearTimeout(timer);
+        }
+        timer = setTimeout(function(){
+          checkShow();
+        }, 200);
+      })
+      checkShow();
+    };
+
+    function checkShow(){
+      //遍历所有图片
+      $(".lazyload img").each(function(){
+        var $cur =$(this);
+        //如果有isLoaded,就不用再加载了,直接结束
+        if($cur.attr('isLoaded')){
+          return;
+        }
+        //如果出现在可视区,加载图片
+        if(shouldShow($cur)){
+          showImg($cur);
+        }
+      })
+    };
+
+    //判断元素是否出现在可视范围内
+    function shouldShow($node){
+      var scrollH = $(window).scrollTop(),  //页面卷去的高度
+          winH = $(window).height(),        //窗口可视区的高度
+          top = $node.offset().top;         //图片元素距离页面顶部的距离
+      console.log(top);
+      if(top < winH + scrollH){
+        return true;
+      }else{
+        return false;
+      }
+    };
+
+    function showImg($node){
+      //将自定义属性data-img保存的路径设置给img的src属性
+      $node.attr('src', $node.attr('data-img'));
+      //给已加载显示过的图片添加一个isLoaded属性
+      $node.attr('isLoaded', true);
+    }
+    return {
+      init: init
+    }
+  })();
+
+  lazyLoad.init();
+
+</script>
+</body>
+</html>
